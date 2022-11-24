@@ -4,19 +4,19 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 # This will be different for you depending on the database server you use. 
-DB_HOST = "database-3.cpob8oy95cbv.us-east-2.rds.amazonaws.com"
-DB_NAME = "ElectionHistory"
+DB_HOST = "localhost"
+DB_NAME = "DatabaseFinalProject"
 DB_USER = "postgres"
 DB_PASS = "Notebook!013"
 
 
 # postgresql+psycopg2://username:password@host:port/database-name
-conn_string = 'postgresql+psycopg2://postgres:Notebook!013@database-3.cpob8oy95cbv.us-east-2.rds.amazonaws.com:5432/ElectionHistory'
+conn_string = 'postgresql+psycopg2://postgres:Notebook!013@localhost:5432/DatabaseFinalProject'
 
 db = create_engine(conn_string)
 conn = db.connect()
 
-
+# the keys are the headers and the lists are the info for each row.
 data = {'Name': ['Tom', 'dick', 'harry'],
 		'Age': [22, 21, 24]}
 
