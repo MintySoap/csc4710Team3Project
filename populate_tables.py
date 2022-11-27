@@ -8,6 +8,7 @@ import datetime
 import psycopg2
 
 # Set up connection between sqlalchemy and postgres dbapi
+#NOTE: change the line below to fit your system
 engine = create_engine(
     "postgresql://soap:brimstone42@localhost:5432/DatabaseFinalProject"
 )
@@ -41,11 +42,12 @@ class GenerateData:
         using the faker library, generate data and execute DML.
         """
 
-        # This will be different for you depending on the database server you use. 
+        # This will be different for you depending on the database server you use.
+        # NOTE: change the info below to fit your system
         DB_HOST = "localhost"
         DB_NAME = "DatabaseFinalProject"
         DB_USER = "soap"
-        DB_PASS = "brimstone42" #note: change this back to Notebook!013 before uploading it to github
+        DB_PASS = "brimstone42"
 
         #create table objects
         voters = metadata.tables["voter"]

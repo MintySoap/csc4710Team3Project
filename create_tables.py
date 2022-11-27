@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, MetaData, \
     Column, Integer, Numeric, String, Date, Table, ForeignKey, Boolean, ARRAY
 
 # Set up connection between sqlalchemy and postgres dbapi
+# NOTE: Change the line below to fit your system
 engine = create_engine(
     "postgresql://soap:brimstone42@localhost:5432/DatabaseFinalProject"
 )
