@@ -48,19 +48,19 @@ class GenerateData:
         DB_PASS = "brimstone42" #note: change this back to Notebook!013 before uploading it to github
 
         #create table objects
-        voters = metadata.tables["Voter"]
-        location = metadata.tables["Location"]
-        poll = metadata.tables["Polling_Location"]
-        party = metadata.tables["Party"]
-        demographic = metadata.tables["Demographic"]
-        policy = metadata.tables["Policy"]
-        issue = metadata.tables["Issue"]
-        platform = metadata.tables["Platform"]
-        candidate = metadata.tables["Candidate"]
-        election = metadata.tables["Election"]
+        voters = metadata.tables["voter"]
+        location = metadata.tables["location"]
+        poll = metadata.tables["polling_location"]
+        party = metadata.tables["party"]
+        demographic = metadata.tables["demographic"]
+        policy = metadata.tables["policy"]
+        issue = metadata.tables["issue"]
+        platform = metadata.tables["platform"]
+        candidate = metadata.tables["candidate"]
+        election = metadata.tables["election"]
 
         #many to many table objects
-        candidate_policy = metadata.tables["Candidate_Policy"]
+        candidate_policy = metadata.tables["candidate_policy"]
 
         #list of fake data
         states_list = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"]
@@ -183,7 +183,7 @@ class GenerateData:
         if(self.table not in metadata.tables.keys()):
             return print(f"{self.table} does not exist")
 
-        if (self.table == "Voter"):
+        if (self.table == "voter"):
             with engine.begin() as conn:
                 for _ in range(self.num_records):
                     cand_id = conn.execute(select(candidate.c.candidate_id)).fetchall()
@@ -194,7 +194,7 @@ class GenerateData:
                         voter_id = random.randint(1,50000000),
                         demographic_id = random.choice(dem_id)[0],
                         candidate_id = random.choice(cand_id)[0],
-                        poll_id =  random.choice(poll_id)[0],
+                        poll_location_id =  random.choice(poll_id)[0],
                         name = faker.name(),
                         age = random.randint(18, 95),
                         race = random.choice(race_list),
@@ -202,7 +202,7 @@ class GenerateData:
                     )
                     conn.execute(insert_stmt)
 
-        if(self.table == "Location"):
+        if(self.table == "location"):
             with engine.begin() as conn:
                 for _ in range(self.num_records):
                     insert_stmt = location.insert().values(
@@ -212,7 +212,7 @@ class GenerateData:
                     )
                     conn.execute(insert_stmt)
 
-        if(self.table == "Polling_Location"):
+        if(self.table == "polling_location"):
             with engine.begin() as conn:
                 for _ in range(self.num_records):
                     loc_id = conn.execute(select(location.c.location_id)).fetchall()
@@ -224,7 +224,7 @@ class GenerateData:
                     )
                     conn.execute(insert_stmt)
 
-        if(self.table == "Party"):
+        if(self.table == "party"):
             with engine.begin() as conn:
                 for i in range(2):
                     for f in range(self.num_records):
@@ -237,7 +237,7 @@ class GenerateData:
                         )
                         conn.execute(insert_stmt)
 
-        if(self.table == "Demographic"):
+        if(self.table == "demographic"):
             with engine.begin() as conn:
                 for a in education_list:
                     for b in wealth_list:
@@ -252,7 +252,7 @@ class GenerateData:
                                 )
                                 conn.execute(insert_stmt)
 
-        if(self.table == "Policy"):
+        if(self.table == "policy"):
             with engine.begin() as conn:
                 for _ in range(self.num_records):
                     iss_id = conn.execute(select(issue.c.issue_id)).fetchall()
@@ -264,7 +264,7 @@ class GenerateData:
                     )
                     conn.execute(insert_stmt)
 
-        if(self.table == "Issue"):
+        if(self.table == "issue"):
             with engine.begin() as conn:
                 for num_of_issue in range(self.num_records):
                     insert_stmt = issue.insert().values(
@@ -273,7 +273,7 @@ class GenerateData:
                     )
                     conn.execute(insert_stmt)
 
-        if(self.table == "Platform"):
+        if(self.table == "platform"):
             with engine.begin() as conn:
                 for _ in range(self.num_records):
                     target_id = conn.execute(select(demographic.c.demographic_id)).fetchall()
@@ -284,7 +284,7 @@ class GenerateData:
                     )
                     conn.execute(insert_stmt)
 
-        if(self.table == "Candidate"):
+        if(self.table == "candidate"):
             with engine.begin() as conn:
                 connection = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
                 connection.autocommit = True
@@ -308,7 +308,7 @@ class GenerateData:
                     conn.execute(insert_stmt)
 
                 #makes a list of all the election id's
-                get_election_ids = "SELECT election_id FROM public.Candidate;"
+                get_election_ids = "SELECT election_id FROM public.candidate;"
                 cursor.execute(get_election_ids)
                 election_ids_list = cursor.fetchall()
 
@@ -319,7 +319,7 @@ class GenerateData:
 
                 #updates the dictionary with the candidates for each election
                 for elect in election_ids_list:
-                    get_candidates_for_election = "SELECT candidate_ID FROM public.Candidate WHERE election_id = " + elect + ";"
+                    get_candidates_for_election = "SELECT candidate_id FROM public.candidate WHERE election_id = " + elect + ";"
                     cursor.execute(get_candidates_for_election)
                     candidates_list = cursor.fetchall()
                     candidates_dict.update({elect : candidates_list})
@@ -345,7 +345,7 @@ class GenerateData:
                 connection.close()
 
         #note: generate elections before candidates so all the elections have a place holder.
-        if(self.table == "Election"):
+        if(self.table == "election"):
             with engine.begin() as conn:
                 for _ in range(self.num_records):
                     insert_stmt = election.insert().values(
@@ -356,7 +356,7 @@ class GenerateData:
                     )
                     conn.execute(insert_stmt)
 
-        if(self.table == "Candidate_Policy"):
+        if(self.table == "candidate_policy"):
             with engine.begin() as conn:
                 for _ in range(self.num_records):
                     can_id = conn.execute(select(candidate.c.candidate_id)).fetchall()
