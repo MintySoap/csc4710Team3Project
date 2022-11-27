@@ -15,12 +15,12 @@ metadata = MetaData()
 #DDL for Party, Voter, Location, Demographic, Polling_Location, Policy, Issue, Platform, Candidate, and Election
 
 voter_table = Table(
-    "Voter",
+    "voter",
     metadata,
     Column("voter_id", Integer, primary_key=True, unique=True),
-    Column("candidate_id", ForeignKey("Candidate.candidate_id"), nullable=False),
-    Column("poll_location_id", ForeignKey("Polling_Location.poll_location_id"), nullable=False),
-    Column("demographic_id", ForeignKey("Demographic.demographic_id"), nullable=False),
+    Column("candidate_id", ForeignKey("candidate.candidate_id"), nullable=False),
+    Column("poll_location_id", ForeignKey("polling_location.poll_location_id"), nullable=False),
+    Column("demographic_id", ForeignKey("demographic.demographic_id"), nullable=False),
     Column("name", String(50), nullable=False),
     Column("age", Integer, nullable=False),
     Column("race", String(50), nullable=False),
@@ -28,7 +28,7 @@ voter_table = Table(
 )
 
 location_table = Table(
-    "Location",
+    "location",
     metadata,
     Column("location_id", Integer, primary_key=True, unique=True),
     Column("state", String(50), nullable=False),
@@ -36,24 +36,24 @@ location_table = Table(
 )
 
 polling_table = Table(
-    "Polling_Location",
+    "polling_location",
     metadata,
     Column("poll_location_id", Integer, primary_key=True, unique=True),
-    Column("location_id", ForeignKey("Location.location_id"), nullable=False),
+    Column("location_id", ForeignKey("location.location_id"), nullable=False),
     Column("ballot_amount", Integer, nullable=False),
 )
 
 party_table = Table(
-    "Party",
+    "party",
     metadata,
     Column("party_id", Integer, primary_key=True, unique=True),
-    Column("platform_id", ForeignKey("Platform.platform_id"), nullable=False),
+    Column("platform_id", ForeignKey("platform.platform_id"), nullable=False),
     Column("state", String(50), nullable=False),
     Column("party_type", String(50), nullable=False),
 )
 
 demographic_table = Table(
-    "Demographic",
+    "demographic",
     metadata,
     Column("demographic_id", Integer, primary_key=True, unique=True),
     Column("education", String(100), nullable=False),
@@ -63,22 +63,22 @@ demographic_table = Table(
 )
 
 policy_table = Table(
-    "Policy",
+    "policy",
     metadata,
     Column("policy_id", Integer, primary_key=True, unique=True),
-    Column("issue_id", ForeignKey("Issue.issue_id"), nullable=False),
+    Column("issue_id", ForeignKey("issue.issue_id"), nullable=False),
     Column("policy", String(100), nullable=False),
 )
 
 issue_table = Table(
-    "Issue",
+    "issue",
     metadata,
     Column("issue_id", Integer, primary_key=True, unique=True),
-    Column("issue", String(100), nullable=False),
+    Column("issue", String(300), nullable=False),
 )
 
 platform_table = Table(
-    "Platform",
+    "platform",
     metadata,
     Column("platform_id", Integer, primary_key=True, unique=True),
     Column("platform_focus", String(100), nullable=False),
@@ -86,12 +86,12 @@ platform_table = Table(
 )
 
 candidate_table = Table(
-    "Candidate",
+    "candidate",
     metadata,
     Column("candidate_id", Integer, primary_key=True, unique=True),
-    Column("party_id", ForeignKey("Party.party_id"), nullable=False),
-    Column("platform_id", ForeignKey("Platform.platform_id"), nullable=False),
-    Column("election_id", ForeignKey("Election.election_id"), nullable=False),
+    Column("party_id", ForeignKey("party.party_id"), nullable=False),
+    Column("platform_id", ForeignKey("platform.platform_id"), nullable=False),
+    Column("election_id", ForeignKey("election.election_id"), nullable=False),
     Column("name", String(100), nullable=False),
     Column("age", Integer, nullable=False),
     Column("race", String(100), nullable=False),
@@ -100,7 +100,7 @@ candidate_table = Table(
 )
 
 election_table = Table(
-    "Election",
+    "election",
     metadata,
     Column("election_id", Integer, primary_key=True, unique=True),
     Column("winner", String(100), nullable=False),
@@ -109,17 +109,10 @@ election_table = Table(
 )
 
 candidate_policy_table = Table(
-    "Candidate_Policy",
+    "candidate_policy",
     metadata,
-    Column("candidate_id", ForeignKey("Platform.platform_id"), nullable=False),
-    Column("policy_id", ForeignKey("Policy.policy_id"), nullable=False),
-)
-
-policy_platform = Table(
-    "Policy_Platform",
-    metadata,
-    Column("policy_id", ForeignKey("Policy.policy_id"), nullable=False),
-    Column("platform_id", ForeignKey("Platform.platform_id"), nullable=False),
+    Column("candidate_id", ForeignKey("candidate.candidate_id"), nullable=False),
+    Column("policy_id", ForeignKey("policy.policy_id"), nullable=False),
 )
 
 # Start transaction to commit DDL to postgres database
