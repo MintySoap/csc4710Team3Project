@@ -1,5 +1,7 @@
 # csc4710Team3Project
 
+NOTE: BEFORE YOU DO ANYTHING PLEASE CHANGE THE CONNECTION INFO IN THE PYTHON FILES. I COMMENTED THEM SO JUST SEARCH UP "NOTE" AND YOU SHOULD SEE THEM
+
 Steps:
 1. run python3 create_tables.py
 2. run "python3 populate_tables.py [insert_table_name_here] [insert_number_of_rows_here]" in this order of table names:  
