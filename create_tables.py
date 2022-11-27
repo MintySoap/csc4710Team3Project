@@ -74,7 +74,7 @@ issue_table = Table(
     "Issue",
     metadata,
     Column("issue_id", Integer, primary_key=True, unique=True),
-    Column("issue", String(100), nullable=False),
+    Column("issue", String(300), nullable=False),
 )
 
 platform_table = Table(
@@ -113,13 +113,6 @@ candidate_policy_table = Table(
     metadata,
     Column("candidate_id", ForeignKey("Platform.platform_id"), nullable=False),
     Column("policy_id", ForeignKey("Policy.policy_id"), nullable=False),
-)
-
-policy_platform = Table(
-    "Policy_Platform",
-    metadata,
-    Column("policy_id", ForeignKey("Policy.policy_id"), nullable=False),
-    Column("platform_id", ForeignKey("Platform.platform_id"), nullable=False),
 )
 
 # Start transaction to commit DDL to postgres database
