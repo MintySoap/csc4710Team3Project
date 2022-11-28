@@ -6,12 +6,18 @@ import sys
 import random
 import datetime
 import psycopg2
+from collections import defaultdict
 
 # Set up connection between sqlalchemy and postgres dbapi
 #NOTE: change the line below to fit your system
 engine = create_engine(
-    "postgresql://soap:brimstone42@localhost:5432/DatabaseFinalProject"
+    "postgresql://postgres:Notebook!013@localhost:5432/DatabaseFinalProject"
 )
+
+DB_HOST = "localhost"
+DB_NAME = "DatabaseFinalProject"
+DB_USER = "postgres"
+DB_PASS = "Notebook!013"
 
 # Create a metadata object
 metadata = MetaData()
@@ -46,8 +52,8 @@ class GenerateData:
         # NOTE: change the info below to fit your system
         DB_HOST = "localhost"
         DB_NAME = "DatabaseFinalProject"
-        DB_USER = "soap"
-        DB_PASS = "brimstone42"
+        DB_USER = "postgres"
+        DB_PASS = "Notebook!013"
 
         #create table objects
         voters = metadata.tables["voter"]
@@ -187,13 +193,17 @@ class GenerateData:
 
         if (self.table == "voter"):
             with engine.begin() as conn:
+                voter_ids = set()
                 for _ in range(self.num_records):
                     cand_id = conn.execute(select(candidate.c.candidate_id)).fetchall()
                     poll_id = conn.execute(select(poll.c.poll_location_id)).fetchall()
                     dem_id = conn.execute(select(demographic.c.demographic_id)).fetchall()
-
+                    my_id = random.randint(1,50000000)
+                    while my_id in voter_ids:
+                        my_id = random.randint(1,50000000)
+                    voter_ids.add(my_id)
                     insert_stmt = voters.insert().values(
-                        voter_id = random.randint(1,50000000),
+                        voter_id = my_id,
                         demographic_id = random.choice(dem_id)[0],
                         candidate_id = random.choice(cand_id)[0],
                         poll_location_id =  random.choice(poll_id)[0],
@@ -309,43 +319,6 @@ class GenerateData:
                     )
                     conn.execute(insert_stmt)
 
-                #makes a list of all the election id's
-                get_election_ids = "SELECT election_id FROM public.candidate;"
-                cursor.execute(get_election_ids)
-                election_ids_list = cursor.fetchall()
-
-                #makes a dictionary of all of the elections with empty candidates
-                candidates_dict = dict()
-                for elec in election_ids_list:
-                    candidates_dict.update({elec : list()})
-
-                #updates the dictionary with the candidates for each election
-                for elect in election_ids_list:
-                    get_candidates_for_election = "SELECT candidate_id FROM public.candidate WHERE election_id = " + elect + ";"
-                    cursor.execute(get_candidates_for_election)
-                    candidates_list = cursor.fetchall()
-                    candidates_dict.update({elect : candidates_list})
-
-                #blank list of winners
-                winners_list = list()
-
-                #Updates the election table with a randomly chosen candidate from each election in the dictionary
-                for elections in election_ids_list:
-                    winner = random.choice(candidates_dict[elections])
-                    winners_list.append(winner) #with every update we will also record a list of the winners
-                    update = update(election)
-                    update = update.values({"winner" : winner}) #so this will randomly choose a candidate from the appropriate election to become a winner
-                    update = update.where(election.c.election_id == elections)
-                    conn.execute(update)
-
-                #updates the candidate table with the candidates that actually won
-                for winners in winners_list:
-                    update = update(candidate)
-                    update = update.values({"winner" : True})
-                    update = update.where(candidate.c.candidate_id == winners)
-                    conn.execute(update)
-                connection.close()
-
         #note: generate elections before candidates so all the elections have a place holder.
         if(self.table == "election"):
             with engine.begin() as conn:
@@ -370,7 +343,45 @@ class GenerateData:
                     )
                     conn.execute(insert_stmt)
 
+def find_winners():
+    connection = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    connection.autocommit = True
+    cursor = connection.cursor() #the cursor is to perform database operations and queries
+    # makes a dictionary of all of the elections with empty candidates
+    candidates_dict = defaultdict(list)   
+    # blank list of winners
+    get_election_ids = "SELECT election_id FROM election;"
+    cursor.execute(get_election_ids)
+    election_ids_list = cursor.fetchall()
+    # makes a dictionary of all of the elections with empty candidates
+    for elec in election_ids_list:
+        # gets all candidates for the election_id of the current iteration
+        get_candidates = "SELECT name, candidate_id FROM candidate WHERE election_id = " + str(elec[0]) + ";"
+        cursor.execute(get_candidates)
+        the_candidates = cursor.fetchall()
+        # adds all candidates from that election into the list that is paired with that election
+        # {election_id : [(candidate_name1, candidate_id1), (candidate_name2, candidate_id2), (candidate_name3, candidate_id3), ....]}
+        for i in the_candidates:
+            candidates_dict[elec[0]].append((i[0], i[1]))
 
+    winners_list = []
+
+    # traverses through candidates_dict and selects winner for each election. adds that winner to winners list. updates election table with the 
+    # winning candidates
+    for k, v in candidates_dict.items():
+        winner = random.choice(v)
+        winners_list.append(winner)
+        # winners_list looks like this: [(candidate_name1, candidate_id1), (candidate_name2, candidate_id2), (candidate_name3, candidate_id3), ....]
+        update_election = "UPDATE election SET winner = '" + winner[0] + "' WHERE election_id=" + str(k) + ";"
+        cursor.execute(update_election)
+
+    #updates the candidate table with the candidates that actually won
+    for winner in winners_list:
+        update_candidate = "UPDATE candidate SET winner = 'true' WHERE candidate_id=" + str(winner[1]) + ";"
+        cursor.execute(update_candidate)
+    connection.close()
+
+# find_winners()
 
 if __name__ == "__main__":    
     generate_data = GenerateData()   

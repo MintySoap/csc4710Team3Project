@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, MetaData, \
 # Set up connection between sqlalchemy and postgres dbapi
 # NOTE: Change the line below to fit your system
 engine = create_engine(
-    "postgresql://soap:brimstone42@localhost:5432/DatabaseFinalProject"
+    "postgresql://postgres:Notebook!013@localhost:5432/DatabaseFinalProject"
 )
 
 # Create a metadata object
