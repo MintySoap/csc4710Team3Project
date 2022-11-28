@@ -32,3 +32,5 @@ Steps:
 
 5. Don't run the file again because it will mess up the number of winners in the database and you will have to regenerate new data!
 
+
+![alt text](https://github.com/MintySoap/csc4710Team3Project/blob/main/ERD.png?raw=true)
