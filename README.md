@@ -28,6 +28,7 @@ Steps:
    lines 386-388 (if __name__ == "__main__":    
                   generate_data = GenerateData()   
                   generate_data.create_data()) are commented out.
+   Then run the populate_tables.py file normally: python3 populate_tables.py.
 
 5. Don't run the file again because it will mess up the number of winners in the database and you will have to regenerate new data!
 
