@@ -1,0 +1,231 @@
+For Database Creation:
+
+    CREATE DATABASE "DatabaseFinalProject"
+        WITH 
+        OWNER = postgres
+        ENCODING = 'UTF8'
+        LC_COLLATE = 'English_United States.1252'
+        LC_CTYPE = 'English_United States.1252'
+        TABLESPACE = pg_default
+        CONNECTION LIMIT = -1;
+
+For candidate Table:
+
+    CREATE TABLE IF NOT EXISTS public.candidate
+    (
+        candidate_id integer NOT NULL DEFAULT nextval('candidate_candidate_id_seq'::regclass),
+        party_id integer NOT NULL,
+        platform_id integer NOT NULL,
+        election_id integer NOT NULL,
+        name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        age integer NOT NULL,
+        race character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        gender character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        winner boolean NOT NULL,
+        CONSTRAINT candidate_pkey PRIMARY KEY (candidate_id),
+        CONSTRAINT candidate_election_id_fkey FOREIGN KEY (election_id)
+            REFERENCES public.election (election_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT candidate_party_id_fkey FOREIGN KEY (party_id)
+            REFERENCES public.party (party_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT candidate_platform_id_fkey FOREIGN KEY (platform_id)
+            REFERENCES public.platform (platform_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+    )
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.candidate
+        OWNER to postgres;
+
+For candidate_policy Table:
+
+    CREATE TABLE IF NOT EXISTS public.candidate_policy
+    (
+        candidate_id integer NOT NULL,
+        policy_id integer NOT NULL,
+        CONSTRAINT candidate_policy_candidate_id_fkey FOREIGN KEY (candidate_id)
+            REFERENCES public.candidate (candidate_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT candidate_policy_policy_id_fkey FOREIGN KEY (policy_id)
+            REFERENCES public.policy (policy_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.candidate_policy
+        OWNER to postgres;
+
+For demographic Table:
+
+    CREATE TABLE IF NOT EXISTS public.demographic
+    (
+        demographic_id integer NOT NULL DEFAULT nextval('demographic_demographic_id_seq'::regclass),
+        education character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        wealth character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        marital_status character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        religion character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        CONSTRAINT demographic_pkey PRIMARY KEY (demographic_id)
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.demographic
+        OWNER to postgres;
+
+For election Table:
+
+    CREATE TABLE IF NOT EXISTS public.election
+    (
+        election_id integer NOT NULL DEFAULT nextval('election_election_id_seq'::regclass),
+        winner character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        election_type character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        year integer NOT NULL,
+        CONSTRAINT election_pkey PRIMARY KEY (election_id)
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.election
+        OWNER to postgres;
+
+
+For issue Table:
+    CREATE TABLE IF NOT EXISTS public.issue
+    (
+        issue_id integer NOT NULL DEFAULT nextval('issue_issue_id_seq'::regclass),
+        issue character varying(300) COLLATE pg_catalog."default" NOT NULL,
+        CONSTRAINT issue_pkey PRIMARY KEY (issue_id)
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.issue
+        OWNER to postgres;
+
+For location Table:
+
+    CREATE TABLE IF NOT EXISTS public.location
+    (
+        location_id integer NOT NULL DEFAULT nextval('location_location_id_seq'::regclass),
+        state character varying(50) COLLATE pg_catalog."default" NOT NULL,
+        city character varying(50) COLLATE pg_catalog."default" NOT NULL,
+        CONSTRAINT location_pkey PRIMARY KEY (location_id)
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.location
+        OWNER to postgres;
+
+For party Table:
+
+    CREATE TABLE IF NOT EXISTS public.party
+    (
+        party_id integer NOT NULL DEFAULT nextval('party_party_id_seq'::regclass),
+        platform_id integer NOT NULL,
+        state character varying(50) COLLATE pg_catalog."default" NOT NULL,
+        party_type character varying(50) COLLATE pg_catalog."default" NOT NULL,
+        CONSTRAINT party_pkey PRIMARY KEY (party_id),
+        CONSTRAINT party_platform_id_fkey FOREIGN KEY (platform_id)
+            REFERENCES public.platform (platform_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.party
+        OWNER to postgres;
+
+For platform Table:
+
+    CREATE TABLE IF NOT EXISTS public.platform
+    (
+        platform_id integer NOT NULL DEFAULT nextval('platform_platform_id_seq'::regclass),
+        platform_focus character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        target_demographic_id integer NOT NULL,
+        CONSTRAINT platform_pkey PRIMARY KEY (platform_id)
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.platform
+        OWNER to postgres;
+
+For policy Table:
+
+    CREATE TABLE IF NOT EXISTS public.policy
+    (
+        policy_id integer NOT NULL DEFAULT nextval('policy_policy_id_seq'::regclass),
+        issue_id integer NOT NULL,
+        policy character varying(100) COLLATE pg_catalog."default" NOT NULL,
+        CONSTRAINT policy_pkey PRIMARY KEY (policy_id),
+        CONSTRAINT policy_issue_id_fkey FOREIGN KEY (issue_id)
+            REFERENCES public.issue (issue_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.policy
+        OWNER to postgres;
+
+
+For polling_location Table:
+
+    CREATE TABLE IF NOT EXISTS public.polling_location
+    (
+        poll_location_id integer NOT NULL DEFAULT nextval('polling_location_poll_location_id_seq'::regclass),
+        location_id integer NOT NULL,
+        ballot_amount integer NOT NULL,
+        CONSTRAINT polling_location_pkey PRIMARY KEY (poll_location_id),
+        CONSTRAINT polling_location_location_id_fkey FOREIGN KEY (location_id)
+            REFERENCES public.location (location_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.polling_location
+        OWNER to postgres;
+
+For voter Table:
+
+    CREATE TABLE IF NOT EXISTS public.voter
+    (
+        voter_id integer NOT NULL DEFAULT nextval('voter_voter_id_seq'::regclass),
+        candidate_id integer NOT NULL,
+        poll_location_id integer NOT NULL,
+        demographic_id integer NOT NULL,
+        name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+        age integer NOT NULL,
+        race character varying(50) COLLATE pg_catalog."default" NOT NULL,
+        gender character varying(50) COLLATE pg_catalog."default" NOT NULL,
+        CONSTRAINT voter_pkey PRIMARY KEY (voter_id),
+        CONSTRAINT voter_candidate_id_fkey FOREIGN KEY (candidate_id)
+            REFERENCES public.candidate (candidate_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT voter_demographic_id_fkey FOREIGN KEY (demographic_id)
+            REFERENCES public.demographic (demographic_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT voter_poll_location_id_fkey FOREIGN KEY (poll_location_id)
+            REFERENCES public.polling_location (poll_location_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS public.voter
+        OWNER to postgres;
