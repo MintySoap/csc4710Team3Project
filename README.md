@@ -1,6 +1,14 @@
 # csc4710Team3Project
 
+Files:
+ERD.png - our ERD diagram
+Project_ER_Diagram.PGERD - The file that PGAdmin opens up to show the ERD
+create_tables.py - The python script that we programmed to create the tables for us
+populate_tables.py - The python script that we programmed to fill our tables with randomly generated data that still fits our schema
+create_insert.sql - holds all of the sql statements for creating the table and inserting each and every row
+
 NOTE: BEFORE YOU DO ANYTHING PLEASE CHANGE THE CONNECTION INFO IN THE PYTHON FILES. I COMMENTED THEM SO JUST SEARCH UP "NOTE" AND YOU SHOULD SEE THEM
+NOTE: Because our database is randomly generated with our python scripts, if you try to run our python scripts with the steps lined out below, you will get a different output than create_insert.sql. However, they should both make sense. This is simply due to the fact that each new generation is unique.
 
 Steps:
 1. run python3 create_tables.py
